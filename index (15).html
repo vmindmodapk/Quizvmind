@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIZ ENGLISH VMIND</title>
+    
+    <!-- PWA Config -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- CDN Resources -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #8b5cf6;
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(20, 20, 30, 0.8);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        body { 
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        
+        /* Loading Screen - CEPAT */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-dark);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(99, 102, 241, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        .loader-text {
+            margin-top: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Particle Background */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        /* Glass Effect */
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        /* Quiz Options - TRANSISI CEPAT */
+        .option {
+            background: rgba(30, 30, 40, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .option:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateX(8px);
+        }
+        
+        .option.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .option.correct {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            border-color: transparent;
+            color: white;
+            animation: correctPulse 0.4s;
+        }
+        
+        .option.wrong {
+            background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+            border-color: transparent;
+            color: white;
+            animation: shake 0.4s;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .option-label {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .option.selected .option-label,
+        .option.correct .option-label,
+        .option.wrong .option-label {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Timer Circle */
+        .timer-circle {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .timer-circle svg {
+            transform: rotate(-90deg);
+            width: 80px;
+            height: 80px;
+        }
+        
+        .timer-circle circle {
+            fill: none;
+            stroke-width: 6;
+        }
+        
+        .timer-bg {
+            stroke: rgba(255, 255, 255, 0.1);
+        }
+        
+        .timer-progress {
+            stroke: var(--primary);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear, stroke 0.3s;
+        }
+        
+        .timer-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        /* Certificate - Realistic Design */
+        .cert-container {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #1e1b4b 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cert-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.03) 10px,
+                rgba(255, 255, 255, 0.03) 20px
+            );
+            animation: shimmer 20s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        .cert-paper {
+            background: linear-gradient(135deg, #fefce8 0%, #fffbeb 50%, #fef3c7 100%);
+            padding: 60px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 
+                0 0 0 1px rgba(251, 191, 36, 0.3),
+                0 0 0 8px rgba(251, 191, 36, 0.1),
+                inset 0 0 100px rgba(251, 191, 36, 0.1);
+            border: 3px double #fbbf24;
+        }
+        
+        .cert-border-inner {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 2px solid rgba(251, 191, 36, 0.4);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+        
+        .cert-border-pattern {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 6px;
+            pointer-events: none;
+        }
+        
+        .cert-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .cert-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #1e3a8a, #3730a3);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            box-shadow: 0 10px 30px rgba(30, 58, 138, 0.4);
+            border: 4px solid #fbbf24;
+        }
+        
+        .cert-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.8rem;
+            color: #1e3a8a;
+            margin: 0;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        
+        .cert-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: #b45309;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        .cert-body {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .cert-presented {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: #92400e;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+        
+        .cert-recipient {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: #1e3a8a;
+            margin: 20px 0;
+            padding: 10px 40px;
+            border-bottom: 3px solid #fbbf24;
+            display: inline-block;
+            min-width: 400px;
+        }
+        
+        .cert-description {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: #78350f;
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .cert-achievement {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(251, 191, 36, 0.05));
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 20px 40px;
+            display: inline-block;
+            margin: 30px 0;
+        }
+        
+        .cert-grade {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            color: #1e3a8a;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .cert-score {
+            font-size: 1.2rem;
+            color: #92400e;
+            margin-top: 5px;
+        }
+        
+        .cert-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 50px;
+            padding: 0 40px;
+        }
+        
+        .cert-signature {
+            text-align: center;
+        }
+        
+        .cert-line {
+            width: 200px;
+            height: 2px;
+            background: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        
+        .cert-label {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.9rem;
+            color: #78350f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .cert-seal {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 30%, #dc2626, #991b1b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            box-shadow: 
+                0 0 0 4px rgba(220, 38, 38, 0.3),
+                0 0 0 8px rgba(220, 38, 38, 0.1),
+                0 10px 30px rgba(220, 38, 38, 0.4);
+            position: relative;
+        }
+        
+        .cert-seal::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+        }
+        
+        .cert-date {
+            text-align: center;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 999px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+        
+        /* Stats Cards */
+        .stat-card {
+            background: rgba(30, 30, 40, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in { animation: slideIn 0.6s ease-out; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .float { animation: float 6s ease-in-out infinite; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        
+        /* Confetti */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        /* Settings Panel */
+        .settings-panel {
+            background: rgba(30, 30, 40, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+        
+        .sound-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .sound-option:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .sound-option.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.2);
+        }
+        
+        .sound-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        /* Music Player */
+        .music-player {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .music-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .music-cover {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .music-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .music-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .music-btn:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .music-btn.play {
+            background: var(--primary);
+            width: 50px;
+            height: 50px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cert-paper { padding: 30px 20px; }
+            .cert-title { font-size: 1.8rem; }
+            .cert-recipient { font-size: 2rem; min-width: auto; padding: 10px 20px; }
+            .cert-footer { flex-direction: column; gap: 30px; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen - CEPAT -->
+    <div id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loader-text">English Quiz Master Vmind</div>
+    </div>
+
+    <!-- Particle Background -->
+    <div id="particles"></div>
+
+    <!-- ==================== LANDING PAGE ==================== -->
+    <div id="landing" class="min-h-screen flex items-center justify-center p-4 relative z-10">
+        <div class="glass rounded-3xl p-8 md:p-12 max-w-2xl w-full shadow-2xl slide-in">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-xl float">
+                    <i class="fas fa-graduation-cap text-4xl text-white"></i>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                    Quiz English Master
+                </h1>
+                <p class="text-gray-400">Uji kemampuan kosakata bahasa Inggrismu</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="stat-card text-center">
+                    <p class="text-sm text-gray-400 mb-1">Total Soal</p>
+                    <p class="text-3xl font-bold text-indigo-400" id="totalSoal">251</p>
+                </div>
+                <div class="stat-card text-center">
+                    <p class="text-sm text-gray-400 mb-1">Waktu/Soal</p>
+                    <p class="text-3xl font-bold text-purple-400">30s</p>
+                </div>
+            </div>
+            
+            <div class="space-y-3">
+                <button onclick="startQuiz()" class="btn-primary w-full text-lg">
+                    <i class="fas fa-play mr-2"></i>Mulai Kuis
+                </button>
+                <button onclick="toggleHistory()" class="btn-secondary w-full text-lg">
+                    <i class="fas fa-history mr-2"></i>Riwayat
+                </button>
+            </div>
+            
+            <!-- History Section -->
+            <div id="historySection" class="hidden mt-6 pt-6 border-t border-gray-700">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg text-indigo-400">
+                        <i class="fas fa-clock-rotate-left mr-2"></i>Riwayat
+                    </h3>
+                    <button onclick="clearHistory()" class="text-red-400 text-sm hover:text-red-300 transition">Hapus</button>
+                </div>
+                <div id="historyList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                
+                <!-- Settings Panel -->
+                <div class="settings-panel mt-6">
+                    <h3 class="font-bold text-lg text-indigo-400 mb-4">
+                        <i class="fas fa-cog mr-2"></i>Pengaturan
+                    </h3>
+                    
+                    <!-- Sound Settings -->
+                    <div class="setting-item">
+                        <div>
+                            <p class="font-semibold">Suara Klik</p>
+                            <p class="text-sm text-gray-400">Pilih efek suara saat menjawab</p>
+                        </div>
+                        <div class="toggle-switch active" id="soundToggle" onclick="toggleSound()"></div>
+                    </div>
+                    
+                    <div id="soundOptions" class="grid grid-cols-3 gap-2 mt-3">
+                        <div class="sound-option selected" onclick="selectSound('default', this)">
+                            <div class="sound-icon bg-indigo-500/20 text-indigo-400">
+                                <i class="fas fa-volume-up"></i>
+                            </div>
+                            <span class="text-sm">Default</span>
+                        </div>
+                        <div class="sound-option" onclick="selectSound('pop', this)">
+                            <div class="sound-icon bg-pink-500/20 text-pink-400">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <span class="text-sm">Pop</span>
+                        </div>
+                        <div class="sound-option" onclick="selectSound('arcade', this)">
+                            <div class="sound-icon bg-green-500/20 text-green-400">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <span class="text-sm">Arcade</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Background Music -->
+                    <div class="setting-item mt-4">
+                        <div>
+                            <p class="font-semibold">Musik Latar</p>
+                            <p class="text-sm text-gray-400">Musik motivasi Bahasa Inggris</p>
+                        </div>
+                        <div class="toggle-switch" id="musicToggle" onclick="toggleMusic()"></div>
+                    </div>
+                    
+                    <div class="music-player" id="musicPlayer" style="display: none;">
+                        <div class="music-info">
+                            <div class="music-cover">
+                                <i class="fas fa-headphones"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-sm">Motivational Mix</p>
+                                <p class="text-xs text-gray-400">English Inspirational</p>
+                                <div class="w-full bg-gray-700 rounded-full h-1 mt-2">
+                                    <div class="bg-indigo-400 h-1 rounded-full" style="width: 0%" id="musicProgress"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="music-controls">
+                            <button class="music-btn" onclick="prevTrack()">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button class="music-btn play" id="playBtn" onclick="togglePlay()">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="music-btn" onclick="nextTrack()">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- About App -->
+                    <div class="mt-6 pt-6 border-t border-gray-700">
+                        <h4 class="font-semibold text-indigo-400 mb-2">
+                            <i class="fas fa-info-circle mr-2"></i>Tentang Aplikasi
+                        </h4>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            <strong class="text-white">English Quiz Master Vmind</strong> adalah aplikasi pembelajaran kosakata Bahasa Inggris yang dirancang khusus untuk pengguna Indonesia. Dibuat oleh <strong class="text-indigo-400">Vmind</strong> untuk membantu meningkatkan kemampuan bahasa Inggris Anda dengan cara yang menyenangkan dan interaktif.
+                        </p>
+                        <p class="text-xs text-gray-500 mt-2">Versi 2.0 • Made with ❤️ by Vmind</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Install Button (PWA) -->
+            <button id="installBtn" class="hidden mt-4 w-full py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold hover:shadow-lg transition-all">
+                <i class="fas fa-download mr-2"></i>Install App
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== QUIZ PAGE ==================== -->
+    <div id="quiz" class="hidden min-h-screen p-4 md:p-8 relative z-10">
+        <div class="max-w-3xl mx-auto">
+            <!-- Header -->
+            <div class="glass rounded-2xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="timer-circle">
+                        <svg>
+                            <circle class="timer-bg" cx="40" cy="40" r="36"></circle>
+                            <circle id="timerProgress" class="timer-progress" cx="40" cy="40" r="36" 
+                                    stroke-dasharray="226" stroke-dashoffset="0"></circle>
+                        </svg>
+                        <div class="timer-text" id="timerDisplay">30</div>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Waktu</p>
+                        <p class="font-semibold text-sm">Detik</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-6 text-center">
+                    <div>
+                        <p class="text-xs text-gray-400">Soal</p>
+                        <p class="text-2xl font-bold text-indigo-400">
+                            <span id="currentNum">1</span>/<span id="totalNum">251</span>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Skor</p>
+                        <p id="score" class="text-2xl font-bold text-purple-400">0</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Benar</p>
+                        <p id="correct" class="text-2xl font-bold text-green-400">0</p>
+                    </div>
+                </div>
+                
+                <button onclick="pauseQuiz()" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-indigo-400 hover:border-indigo-400 transition">
+                    <i class="fas fa-pause"></i>
+                </button>
+            </div>
+            
+            <!-- Question -->
+            <div class="glass rounded-3xl p-6 md:p-10 shadow-2xl mb-6">
+                <span class="inline-block px-4 py-1 rounded-full text-sm font-semibold mb-4 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                    Pilih jawaban yang benar
+                </span>
+                <h2 id="question" class="text-3xl md:text-4xl font-bold mb-8 text-white">Loading...</h2>
+                <div id="options" class="grid gap-4"></div>
+            </div>
+            
+            <!-- Progress -->
+            <div class="glass rounded-full p-3">
+                <div class="progress-container">
+                    <div id="progress" class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PAUSE MODAL ==================== -->
+    <div id="pauseModal" class="modal-overlay">
+        <div class="modal-content text-center">
+            <i class="fas fa-pause-circle text-6xl mb-4 text-indigo-400"></i>
+            <h2 class="text-2xl font-bold mb-2">Kuis Dijeda</h2>
+            <p class="text-gray-400 mb-6">Progres tersimpan. Lanjutkan nanti dari riwayat.</p>
+            <button onclick="resumeQuiz()" class="btn-primary w-full mb-3">Lanjutkan</button>
+            <button onclick="saveExit()" class="btn-secondary w-full">Simpan & Keluar</button>
+        </div>
+    </div>
+
+    <!-- ==================== RESULTS PAGE ==================== -->
+    <div id="results" class="hidden min-h-screen p-4 md:p-8 relative z-10 pb-20">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-8 slide-in">
+                <h1 class="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                    Hasil Evaluasi
+                </h1>
+                <p class="text-gray-400">Lihat hasil dan sertifikatmu</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-5 gap-6">
+                <!-- Stats -->
+                <div class="lg:col-span-2 glass rounded-3xl p-6 md:p-8 slide-in h-fit">
+                    <h2 class="text-xl font-bold mb-6 text-indigo-400">
+                        <i class="fas fa-chart-pie mr-2"></i>Statistik
+                    </h2>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <div class="stat-card text-center border border-green-500/30 bg-green-500/10">
+                            <i class="fas fa-check-circle text-3xl text-green-400 mb-2"></i>
+                            <p class="text-sm text-gray-400">Benar</p>
+                            <p id="finalCorrect" class="text-3xl font-bold text-green-400">0</p>
+                        </div>
+                        <div class="stat-card text-center border border-red-500/30 bg-red-500/10">
+                            <i class="fas fa-times-circle text-3xl text-red-400 mb-2"></i>
+                            <p class="text-sm text-gray-400">Salah</p>
+                            <p id="finalWrong" class="text-3xl font-bold text-red-400">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between p-4 rounded-xl bg-gray-800/50 border border-gray-700">
+                            <span class="font-semibold">Total Skor</span>
+                            <span id="finalScore" class="text-xl font-bold text-indigo-400">0</span>
+                        </div>
+                        <div class="flex justify-between p-4 rounded-xl bg-gray-800/50 border border-gray-700">
+                            <span class="font-semibold">Akurasi</span>
+                            <span id="finalAccuracy" class="text-xl font-bold text-purple-400">0%</span>
+                        </div>
+                        <div class="flex justify-between p-4 rounded-xl bg-gray-800/50 border border-gray-700">
+                            <span class="font-semibold">Nilai</span>
+                            <span id="finalGrade" class="text-3xl font-bold text-yellow-400">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="scrollToCert()" class="btn-primary flex-1 text-sm">
+                            <i class="fas fa-certificate mr-1"></i>Sertifikat
+                        </button>
+                        <button onclick="location.reload()" class="btn-secondary flex-1 text-sm">
+                            <i class="fas fa-redo mr-1"></i>Ulangi
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Certificate -->
+                <div class="lg:col-span-3 slide-in" id="certSection">
+                    <div class="cert-container" id="certContainer">
+                        <div class="cert-paper">
+                            <div class="cert-border-inner"></div>
+                            <div class="cert-border-pattern"></div>
+                            
+                            <div class="cert-header">
+                                <div class="cert-logo">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <h1 class="cert-title">Sertifikat</h1>
+                                <p class="cert-subtitle">Penyelesaian English Quiz Master</p>
+                            </div>
+                            
+                            <div class="cert-body">
+                                <p class="cert-presented">Diberikan Kepada</p>
+                                <div class="cert-recipient" id="certName">[Nama Peserta]</div>
+                                
+                                <p class="cert-description">
+                                    Atas keberhasilan menyelesaikan kuis<br>
+                                    <strong>"Mastering English Vocabulary"</strong><br>
+                                    dengan hasil yang memuaskan
+                                </p>
+                                
+                                <div class="cert-achievement">
+                                    <div class="cert-grade" id="certScore">A</div>
+                                    <div class="cert-score" id="certPercent">(95%)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="cert-footer">
+                                <div class="cert-date">
+                                    <div class="cert-line"></div>
+                                    <p class="cert-label">Tanggal</p>
+                                    <p id="certDate" class="font-semibold text-gray-800">-</p>
+                                </div>
+                                
+                                <div class="cert-seal">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                
+                                <div class="cert-signature">
+                                    <div class="cert-line"></div>
+                                    <p class="cert-label">Instruktur</p>
+                                    <p class="font-bold text-gray-800" style="font-family: 'Great Vibes', cursive; font-size: 1.8rem;">
+                                        English Master Vmind
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Input Name -->
+                    <div class="mt-6 glass rounded-2xl p-6">
+                        <label class="block text-sm font-semibold text-center mb-3 text-indigo-400">
+                            <i class="fas fa-user-edit mr-2"></i>Nama di Sertifikat:
+                        </label>
+                        <div class="flex gap-3 max-w-md mx-auto">
+                            <input type="text" id="nameInput" placeholder="Ketik nama..." 
+                                   class="flex-1 px-4 py-3 rounded-xl outline-none text-center font-semibold text-sm bg-gray-800 border-2 border-gray-700 text-white focus:border-indigo-500 transition"
+                                   oninput="updateName(this.value)">
+                            <button onclick="printCert()" class="btn-primary px-4">
+                                <i class="fas fa-print"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="soundCorrect" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE" type="audio/wav">
+    </audio>
+    <audio id="soundWrong" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE" type="audio/wav">
+    </audio>
+    
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <!-- Using a placeholder - in real app use actual motivational English songs -->
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // ==================== PWA REGISTRATION ====================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((reg) => console.log('SW registered:', reg.scope))
+                    .catch((err) => console.log('SW failed:', err));
+            });
+        }
+        
+        // Install Button Logic
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('installBtn');
+            if (installBtn) installBtn.classList.remove('hidden');
+        });
+        
+        document.getElementById('installBtn')?.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('installBtn').classList.add('hidden');
+                }
+                deferredPrompt = null;
+            }
+        });
+        
+        // ==================== PARTICLE BACKGROUND ====================
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+        
+        // ==================== LOADING SCREEN - CEPAT ====================
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                document.getElementById('loadingScreen').style.visibility = 'hidden';
+            }, 800); // CEPAT - hanya 0.8 detik
+        });
+        
+        // ==================== SETTINGS & MUSIC ====================
+        let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+        let currentSound = localStorage.getItem('soundType') || 'default';
+        let musicEnabled = localStorage.getItem('musicEnabled') === 'true';
+        let isPlaying = false;
+        let musicProgress = 0;
+        let progressInterval;
+        
+        const motivationalTracks = [
+            { title: "Rise Up", artist: "Motivational", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { title: "Never Give Up", artist: "Inspirational", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { title: "Dream Big", artist: "English Mix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
+        ];
+        let currentTrack = 0;
+        
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('soundEnabled', soundEnabled);
+            const toggle = document.getElementById('soundToggle');
+            if (soundEnabled) {
+                toggle.classList.add('active');
+                document.getElementById('soundOptions').style.opacity = '1';
+                document.getElementById('soundOptions').style.pointerEvents = 'auto';
+            } else {
+                toggle.classList.remove('active');
+                document.getElementById('soundOptions').style.opacity = '0.5';
+                document.getElementById('soundOptions').style.pointerEvents = 'none';
+            }
+        }
+        
+        function selectSound(type, el) {
+            currentSound = type;
+            localStorage.setItem('soundType', type);
+            document.querySelectorAll('.sound-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            playTestSound(type);
+        }
+        
+        function playTestSound(type) {
+            if (!soundEnabled) return;
+            const audio = new Audio();
+            // Different sound frequencies for different types
+            const frequencies = { default: 800, pop: 1200, arcade: 600 };
+            // Create simple beep sound
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = frequencies[type] || 800;
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.1);
+        }
+        
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+            localStorage.setItem('musicEnabled', musicEnabled);
+            const toggle = document.getElementById('musicToggle');
+            const player = document.getElementById('musicPlayer');
+            const bgMusic = document.getElementById('bgMusic');
+            
+            if (musicEnabled) {
+                toggle.classList.add('active');
+                player.style.display = 'block';
+                bgMusic.src = motivationalTracks[currentTrack].url;
+                bgMusic.volume = 0.3;
+                bgMusic.play().then(() => {
+                    isPlaying = true;
+                    updatePlayButton();
+                    startProgress();
+                }).catch(e => console.log('Audio play failed:', e));
+            } else {
+                toggle.classList.remove('active');
+                player.style.display = 'none';
+                bgMusic.pause();
+                isPlaying = false;
+                updatePlayButton();
+                stopProgress();
+            }
+        }
+        
+        function togglePlay() {
+            const bgMusic = document.getElementById('bgMusic');
+            if (isPlaying) {
+                bgMusic.pause();
+                isPlaying = false;
+                stopProgress();
+            } else {
+                bgMusic.play().then(() => {
+                    isPlaying = true;
+                    startProgress();
+                }).catch(e => console.log('Audio play failed:', e));
+            }
+            updatePlayButton();
+        }
+        
+        function updatePlayButton() {
+            const btn = document.getElementById('playBtn');
+            btn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+        }
+        
+        function startProgress() {
+            stopProgress();
+            progressInterval = setInterval(() => {
+                const bgMusic = document.getElementById('bgMusic');
+                if (bgMusic.duration) {
+                    const progress = (bgMusic.currentTime / bgMusic.duration) * 100;
+                    document.getElementById('musicProgress').style.width = progress + '%';
+                }
+            }, 1000);
+        }
+        
+        function stopProgress() {
+            clearInterval(progressInterval);
+        }
+        
+        function prevTrack() {
+            currentTrack = (currentTrack - 1 + motivationalTracks.length) % motivationalTracks.length;
+            changeTrack();
+        }
+        
+        function nextTrack() {
+            currentTrack = (currentTrack + 1) % motivationalTracks.length;
+            changeTrack();
+        }
+        
+        function changeTrack() {
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.src = motivationalTracks[currentTrack].url;
+            if (isPlaying) {
+                bgMusic.play().then(() => startProgress());
+            }
+            // Update info
+            const info = document.querySelector('.music-info div:last-child');
+            info.querySelector('p.font-semibold').textContent = motivationalTracks[currentTrack].title;
+            info.querySelector('p.text-xs').textContent = motivationalTracks[currentTrack].artist;
+        }
+        
+        // Initialize settings
+        if (!soundEnabled) {
+            document.getElementById('soundToggle').classList.remove('active');
+            document.getElementById('soundOptions').style.opacity = '0.5';
+            document.getElementById('soundOptions').style.pointerEvents = 'none';
+        }
+        
+        document.querySelectorAll('.sound-option').forEach(opt => opt.classList.remove('selected'));
+        const soundMap = { 'default': 0, 'pop': 1, 'arcade': 2 };
+        const soundIndex = soundMap[currentSound] || 0;
+        document.querySelectorAll('.sound-option')[soundIndex]?.classList.add('selected');
+        
+        if (musicEnabled) {
+            toggleMusic(); // Will toggle it on
+        }
+
+        // ==================== QUIZ DATA ====================
+        const quizData = [
+            {q:"I",options:["Kamu","Saya","Mereka","Dia"],correct:1},
+            {q:"You",options:["Kami","Dia","Kamu/Kalian","Saya"],correct:2},
+            {q:"We",options:["Kami/Kita","Mereka","Dia","Kalian"],correct:0},
+            {q:"He",options:["Dia (perempuan)","Mereka","Dia (laki-laki)","Kita"],correct:2},
+            {q:"She",options:["Dia (laki-laki)","Dia (perempuan)","Itu","Saya"],correct:1},
+            {q:"They",options:["Kami","Kalian","Mereka","Dia"],correct:2},
+            {q:"It",options:["Dia/Itu (benda/hewan)","Saya","Kamu","Mereka"],correct:0},
+            {q:"Myself",options:["Kamu sendiri","Saya sendiri","Mereka sendiri","Dia sendiri"],correct:1},
+            {q:"Yourself",options:["Kami sendiri","Dia sendiri","Kamu sendiri","Saya sendiri"],correct:2},
+            {q:"Themselves",options:["Kita sendiri","Mereka sendiri","Kalian sendiri","Dia sendiri"],correct:1},
+            {q:"Ourselves",options:["Kami/Kita sendiri","Saya sendiri","Mereka sendiri","Dia sendiri"],correct:0},
+            {q:"Himself",options:["Dia sendiri (perempuan)","Dia sendiri (laki-laki)","Benda itu sendiri","Saya sendiri"],correct:1},
+            {q:"Herself",options:["Dia sendiri (laki-laki)","Kamu sendiri","Dia sendiri (perempuan)","Mereka sendiri"],correct:2},
+            {q:"Itself",options:["Dia sendiri (benda/binatang)","Saya sendiri","Kami sendiri","Mereka sendiri"],correct:0},
+            {q:"Me (objek)",options:["Kamu","Dia","Saya/Aku","Mereka"],correct:2},
+            {q:"You (objek)",options:["Saya","Kamu/Anda/Kalian","Kami","Dia"],correct:1},
+            {q:"Her (objek)",options:["Dia (perempuan)","Dia (laki-laki)","Mereka","Kita"],correct:0},
+            {q:"Him (objek)",options:["Saya","Mereka","Dia (laki-laki)","Dia (perempuan)"],correct:2},
+            {q:"It (objek)",options:["Kamu","Dia/Itu/-nya (benda)","Kami","Saya"],correct:1},
+            {q:"Us (objek)",options:["Mereka","Dia","Kita/Kami","Kalian"],correct:2},
+            {q:"Them (objek)",options:["Mereka","Kita","Dia","Kamu"],correct:0},
+            {q:"My food",options:["Makanan kamu","Makanan mereka","Makanan saya","Makanan dia"],correct:2},
+            {q:"Your food",options:["Makanan saya","Makanan kamu/Anda","Makanan kami","Makanan dia"],correct:1},
+            {q:"His food",options:["Makanan dia (laki-laki)","Makanan dia (perempuan)","Makanan kita","Makanan mereka"],correct:0},
+            {q:"Her food",options:["Makanan saya","Makanan dia (perempuan)","Makanan dia (laki-laki)","Makanan itu"],correct:1},
+            {q:"Its food",options:["Makanan kita","Makanan mereka","Makanan dia/itu/-nya (benda/hewan)","Makanan saya"],correct:2},
+            {q:"Our food",options:["Makanan kami/kita","Makanan mereka","Makanan kalian","Makanan dia"],correct:0},
+            {q:"Their food",options:["Makanan kami","Makanan mereka","Makanan saya","Makanan kamu"],correct:1},
+            {q:"Mine",options:["Milikmu","Milik dia","Milik saya","Milik mereka"],correct:2},
+            {q:"Yours",options:["Milik saya","Milikmu","Milik kami","Milik dia"],correct:1},
+            {q:"His",options:["Milik dia (laki-laki)","Milik dia (perempuan)","Milik saya","Milik kita"],correct:0},
+            {q:"Hers",options:["Milik dia (laki-laki)","Milik dia (perempuan)","Milik mereka","Milik kamu"],correct:1},
+            {q:"Its",options:["Miliknya (benda/binatang)","Milik saya","Milik kamu","Milik kami"],correct:0},
+            {q:"Ours",options:["Milik mereka","Milik kami/kita","Milik dia","Milik saya"],correct:1},
+            {q:"Theirs",options:["Milik kita","Milik kamu","Milik mereka","Milik saya"],correct:2},
+            {q:"Grandparents",options:["Orang tua","Kakek-nenek","Paman-bibi","Saudara kandung"],correct:1},
+            {q:"Grandfather",options:["Kakek","Nenek","Ayah","Paman"],correct:0},
+            {q:"Grandmother",options:["Bibi","Ibu","Nenek","Kakak perempuan"],correct:2},
+            {q:"Husband",options:["Istri","Suami","Teman","Menantu"],correct:1},
+            {q:"Wife",options:["Ibu","Anak perempuan","Istri","Bibi"],correct:2},
+            {q:"Parent",options:["Saudara","Wali","Orang tua","Kakek"],correct:2},
+            {q:"Father",options:["Ayah","Paman","Abang","Anak laki-laki"],correct:0},
+            {q:"Mother",options:["Ibu","Nenek","Kakak perempuan","Bibi"],correct:0},
+            {q:"Daughter",options:["Anak laki-laki","Anak perempuan","Cucu perempuan","Keponakan"],correct:1},
+            {q:"Son",options:["Anak laki-laki","Saudara laki-laki","Cucu laki-laki","Ayah"],correct:0},
+            {q:"Sister",options:["Saudara perempuan","Sepupu","Saudara laki-laki","Teman"],correct:0},
+            {q:"Brother",options:["Paman","Sepupu","Saudara laki-laki","Keponakan"],correct:2},
+            {q:"Granddaughter",options:["Cucu laki-laki","Anak perempuan","Cucu perempuan","Cicit"],correct:2},
+            {q:"Grandson",options:["Anak laki-laki","Cucu laki-laki","Menantu","Keponakan"],correct:1},
+            {q:"Uncle",options:["Bibi","Paman","Kakek","Ayah"],correct:1},
+            {q:"Aunt",options:["Nenek","Ibu","Bibi","Kakak"],correct:2},
+            {q:"Niece",options:["Keponakan laki-laki","Keponakan perempuan","Cucu","Adik"],correct:1},
+            {q:"Nephew",options:["Keponakan perempuan","Keponakan laki-laki","Saudara ipar","Sepupu"],correct:1},
+            {q:"Cousin",options:["Saudara kandung","Sepupu","Sahabat","Keponakan"],correct:1},
+            {q:"Parent-in-law",options:["Orang tua angkat","Mertua","Saudara ipar","Menantu"],correct:1},
+            {q:"Son-in-law",options:["Anak tiri laki-laki","Menantu laki-laki","Mertua laki-laki","Saudara ipar"],correct:1},
+            {q:"Daughter-in-law",options:["Menantu perempuan","Anak tiri perempuan","Ibu mertua","Saudara ipar"],correct:0},
+            {q:"Step child",options:["Anak kandung","Anak angkat","Anak tiri","Anak asuh"],correct:2},
+            {q:"Stepson",options:["Anak tiri perempuan","Anak tiri laki-laki","Anak angkat laki-laki","Cucu tiri"],correct:1},
+            {q:"Stepdaughter",options:["Menantu perempuan","Anak tiri laki-laki","Anak tiri perempuan","Keponakan tiri"],correct:2},
+            {q:"Adoption",options:["Adaptasi","Adopsi","Pernikahan","Perceraian"],correct:1},
+            {q:"Adoptive father",options:["Ayah kandung","Ayah tiri","Ayah mertua","Ayah dari adopsi"],correct:3},
+            {q:"Adoptive mother",options:["Ibu kandung","Ibu dari adopsi","Ibu tiri","Ibu pengasuh"],correct:1},
+            {q:"Ancestor",options:["Keturunan","Nenek moyang / Leluhur","Saudara jauh","Orang tua"],correct:1},
+            {q:"Bachelor",options:["Menikah","Perjaka","Duda","Tunangan"],correct:1},
+            {q:"Birth mother",options:["Ibu angkat","Ibu kandung","Ibu tiri","Ibu mertua"],correct:1},
+            {q:"Blood relative",options:["Kerabat jauh","Kerabat sedarah","Keluarga angkat","Teman akrab"],correct:1},
+            {q:"Bride",options:["Pengantin laki-laki","Pengantin perempuan","Pendamping pengantin","Wali nikah"],correct:1},
+            {q:"Bridegroom",options:["Pengantin laki-laki","Pengantin perempuan","Orang tua pengantin","Tamu undangan"],correct:0},
+            {q:"Brotherhood",options:["Persaudaraan","Teman laki-laki","Kelompok pria","Saudara ipar"],correct:0},
+            {q:"Brotherly",options:["Seperti ayah","Bersifat persaudaraan","Kasar","Egois"],correct:1},
+            {q:"Brother-in-law",options:["Saudara ipar laki-laki","Saudara ipar perempuan","Mertua laki-laki","Menantu laki-laki"],correct:0},
+            {q:"Care-giver",options:["Orang yang cuek","Orang yang mengurus anggota keluarga","Dokter pribadi","Guru privat"],correct:1},
+            {q:"Child",options:["Orang dewasa","Bayi","Anak","Remaja"],correct:2},
+            {q:"Childhood",options:["Masa tua","Masa sekolah","Masa anak-anak","Masa remaja"],correct:2},
+            {q:"Children",options:["Anak tunggal","Anak-anak","Orang tua","Bayi-bayi"],correct:1},
+            {q:"Clan",options:["Keluarga kecil","Teman sekolah","Klan / Keluarga besar","Organisasi"],correct:2},
+            {q:"Close-knit",options:["Hubungan renggang","Hubungan erat","Hubungan baru","Hubungan kerja"],correct:1},
+            {q:"Connection",options:["Perpisahan","Koneksi / Hubungan","Perselisihan","Perjanjian"],correct:1},
+            {q:"Dad",options:["Kakek","Ayah","Paman","Kakak"],correct:1},
+            {q:"Daddy",options:["Ayah","Ibu","Bayi","Teman"],correct:0},
+            {q:"Descendant",options:["Leluhur","Keturunan / Anak-cucu","Saudara angkat","Mertua"],correct:1},
+            {q:"Divorce",options:["Pernikahan","Pertunangan","Perceraian","Rujuk"],correct:2},
+            {q:"Engaged",options:["Menikah","Bertunangan","Putus","Jomblo"],correct:1},
+            {q:"Engagement",options:["Pernikahan","Tunangan (acara/status)","Reuni","Pesta"],correct:1},
+            {q:"Estranged",options:["Diasingkan / Menjauh","Sangat akrab","Berkumpul","Berdamai"],correct:0},
+            {q:"Ex",options:["Mantan / Bekas","Calon","Pasangan","Saudara"],correct:0},
+            {q:"Ex husband",options:["Calon suami","Mantan suami","Suami sirih","Suami orang"],correct:1},
+            {q:"Ex wife",options:["Mantan istri","Calon istri","Istri muda","Ibu tiri"],correct:0},
+            {q:"Extended family",options:["Keluarga inti","Keluarga besar","Keluarga angkat","Tetangga"],correct:1},
+            {q:"Family tree",options:["Pohon pelindung","Pohon keluarga / Silsilah","Kebun keluarga","Warisan keluarga"],correct:1},
+            {q:"Fiancée",options:["Mantan pacar","Pasangan tunangan","Teman kencan","Istri sah"],correct:1},
+            {q:"Flesh and blood",options:["Teman baik","Darah daging","Orang asing","Luka fisik"],correct:1},
+            {q:"Folks",options:["Musuh","Sanak saudara / Orang-orang","Anak muda","Tetangga"],correct:1},
+            {q:"Foster child",options:["Anak kandung","Anak tiri","Anak angkat / asuh","Anak hilang"],correct:2},
+            {q:"Foster father",options:["Ayah angkat","Ayah kandung","Ayah mertua","Kakek"],correct:0},
+            {q:"Foster mother",options:["Ibu tiri","Ibu angkat","Ibu kandung","Ibu mertua"],correct:1},
+            {q:"Foster parent",options:["Orang tua kandung","Orang tua angkat","Guru","Wali kelas"],correct:1},
+            {q:"Fraternal",options:["Persaudaraan","Permusuhan","Keibuan","Kebapakan"],correct:0},
+            {q:"Friend",options:["Musuh","Teman","Pacar","Saudara"],correct:1},
+            {q:"Fraternal twin",options:["Saudara sepupu","Saudara kembar","Saudara tiri","Saudara angkat"],correct:1},
+            {q:"Genealogy",options:["Ilmu bumi","Silsilah keturunan","Ilmu sejarah","Biodata"],correct:1},
+            {q:"Grandpa",options:["Ayah","Kakek","Paman","Abang"],correct:1},
+            {q:"Gramps",options:["Ayah","Kakek (lebih informal)","Nenek","Adik"],correct:1},
+            {q:"Grandma",options:["Nenek","Ibu","Bibi","Kakak perempuan"],correct:0},
+            {q:"Granny",options:["Kakek","Nenek","Ibu","Cucu"],correct:1},
+            {q:"Great-granddaughter",options:["Cicit laki-laki","Cucu perempuan","Cicit perempuan","Keponakan"],correct:2},
+            {q:"Great-grandfather",options:["Buyut laki-laki","Kakek","Ayah mertua","Paman"],correct:0},
+            {q:"Great-grandmother",options:["Nenek","Buyut perempuan","Ibu angkat","Bibi"],correct:1},
+            {q:"Great-grandparent",options:["Orang tua","Mertua","Buyut","Saudara kandung"],correct:2},
+            {q:"Great-grandson",options:["Cicit laki-laki","Cicit perempuan","Keponakan laki-laki","Sepupu"],correct:0},
+            {q:"Great-aunt",options:["Bibi dari orang tua","Nenek","Kakak perempuan","Ibu mertua"],correct:0},
+            {q:"Great-uncle",options:["Kakek","Paman dari orang tua","Adik laki-laki","Ayah mertua"],correct:1},
+            {q:"Groom",options:["Pengantin perempuan","Mempelai laki-laki","Pendamping pria","Tamu undangan"],correct:1},
+            {q:"Grownup",options:["Anak-anak","Remaja","Dewasa","Bayi"],correct:2},
+            {q:"Half-brother",options:["Saudara kandung","Abang tiri","Adik ipar","Sepupu"],correct:1},
+            {q:"Half-sister",options:["Kakak tiri","Adik perempuan","Bibi","Teman"],correct:0},
+            {q:"Heir",options:["Pelayan","Ahli waris","Pemilik rumah","Musuh"],correct:1},
+            {q:"Heiress",options:["Ahli waris perempuan","Ratu","Putri mahkota","Istri"],correct:0},
+            {q:"Helpmate",options:["Pembantu (suami/istri)","Rekan kerja","Tetangga","Musuh"],correct:0},
+            {q:"Hereditary",options:["Baru saja","Turun-temurun","Sangat kuno","Berharga"],correct:1},
+            {q:"Heritage",options:["Bangunan","Warisan","Perhiasan","Masa lalu"],correct:1},
+            {q:"History",options:["Geografi","Masa depan","Sejarah","Cerita"],correct:2},
+            {q:"Home",options:["Sekolah","Rumah","Kantor","Taman"],correct:1},
+            {q:"Household",options:["Rumah tangga","Kamar mandi","Atap rumah","Halaman"],correct:0},
+            {q:"Identical twin",options:["Kembar identik","Saudara jauh","Kakak beradik","Anak angkat"],correct:0},
+            {q:"Inherit",options:["Menjual","Mewarisi","Meminjam","Memberikan"],correct:1},
+            {q:"Inheritance",options:["Tabungan","Warisan","Pinjaman","Gaji"],correct:1},
+            {q:"Infant",options:["Balita","Bayi baru lahir","Anak sekolah","Orang tua"],correct:1},
+            {q:"Infancy",options:["Masa bayi","Masa remaja","Masa sekolah","Masa tua"],correct:0},
+            {q:"Juvenile",options:["Anak muda/remaja","Orang dewasa","Lansia","Bayi"],correct:0},
+            {q:"Kin",options:["Orang asing","Musuh","Kerabat/sanak famili","Teman sekolah"],correct:2},
+            {q:"Kindred",options:["Keluarga","Orang luar","Tetangga","Pendatang"],correct:0},
+            {q:"Kinfolk",options:["Orang tua","Kerabat","Warga","Pasien"],correct:1},
+            {q:"Kinship",options:["Persahabatan","Kekerabatan","Permusuhan","Kerjasama"],correct:1},
+            {q:"Kith",options:["Kenalan/handai taulan","Orang jahat","Keluarga inti","Atasan"],correct:0},
+            {q:"Lineage",options:["Garis silsilah keluarga","Nama belakang","Tempat lahir","Hobi keluarga"],correct:0},
+            {q:"Love",options:["Benci","Marah","Cinta/kasih sayang","Sedih"],correct:2},
+            {q:"Loyalty",options:["Pengkhianatan","Kesetiaan","Kebohongan","Keberanian"],correct:1},
+            {q:"Maiden name",options:["Nama panggilan","Nama gadis","Nama keluarga","Nama baptis"],correct:1},
+            {q:"Mama",options:["Ayah","Kakak","Ibu","Adik"],correct:2},
+            {q:"Marriage",options:["Perceraian","Pertunangan","Pernikahan","Persalinan"],correct:2},
+            {q:"Mate",options:["Kawan/pasangan","Lawan","Musuh","Orang asing"],correct:0},
+            {q:"Maternal",options:["Keayahan","Keibuan","Persaudaraan","Ketetanggaan"],correct:1},
+            {q:"Matriarch",options:["Ayah pemimpin keluarga","Ibu pemimpin keluarga","Anak sulung","Kakek buyut"],correct:1},
+            {q:"Matrimony",options:["Ikatan suci pernikahan","Akta kelahiran","Surat cerai","Perjanjian kerja"],correct:0},
+            {q:"Minor",options:["Orang sangat tua","Orang yang belum dewasa","Pemimpin","Pekerja"],correct:1},
+            {q:"Miss",options:["Tuan","Nyonya","Nona","Anak laki-laki"],correct:2},
+            {q:"Mom",options:["Ayah","Ibu","Bibi","Nenek"],correct:1},
+            {q:"Mommy",options:["Ibu","Kakek","Kakak","Paman"],correct:0},
+            {q:"Monogamy",options:["Menikah berkali-kali","Pernikahan tunggal","Tidak menikah","Tunangan"],correct:1},
+            {q:"Mother",options:["Ayah","Ibu","Anak","Cucu"],correct:1},
+            {q:"Mr.",options:["Nona","Nyonya","Tuan","Saudari"],correct:2},
+            {q:"Mrs.",options:["Tuan","Nona","Nyonya","Gadis"],correct:2},
+            {q:"Ms.",options:["Nyonya","Nona","Tuan","Paman"],correct:1},
+            {q:"Newlywed",options:["Pasangan baru menikah","Mantan suami/istri","Tunangan","Calon pengantin"],correct:0},
+            {q:"Nuclear family",options:["Keluarga besar","Keluarga inti","Tetangga dekat","Kerabat jauh"],correct:1},
+            {q:"Nuptial",options:["Berhubungan dengan kematian","Berhubungan dengan pernikahan","Berhubungan dengan kelahiran","Berhubungan dengan sekolah"],correct:1},
+            {q:"Nurture",options:["Pengasuhan","Pengabaian","Pelajaran","Permainan"],correct:0},
+            {q:"Offspring",options:["Orang tua","Leluhur","Keturunan","Saudara ipar"],correct:2},
+            {q:"Orphan",options:["Anak emas","Yatim-piatu","Anak tunggal","Anak sulung"],correct:1},
+            {q:"Papa",options:["Ibu","Paman","Ayah","Kakek"],correct:2},
+            {q:"Partner",options:["Rekan","Musuh","Saingan","Lawan main"],correct:0},
+            {q:"Paternal",options:["Berhubungan dengan Ayah","Berhubungan dengan Ibu","Berhubungan dengan Anak","Berhubungan dengan Guru"],correct:0},
+            {q:"Patriarch",options:["Ibu pemimpin keluarga","Ayah sebagai kepala keluarga","Anak bungsu","Sepupu laki-laki"],correct:1},
+            {q:"Pop",options:["Ibu (panggilan)","Ayah (panggilan)","Kakek (panggilan)","Adik (panggilan)"],correct:1},
+            {q:"Posterity",options:["Nenek moyang","Anak-cucu","Orang tua","Masa lalu"],correct:1},
+            {q:"Progenator",options:["Cicit","Nenek moyang","Anak angkat","Saudara jauh"],correct:1},
+            {q:"Progeny",options:["Orang tua","Anak-cucu/keturunan","Saudara jauh","Teman dekat"],correct:1},
+            {q:"Quadruplets",options:["Kembar dua","Kembar tiga","Kembar empat","Kembar lima"],correct:2},
+            {q:"Quints",options:["Kembar lima","Kembar empat","Kembar enam","Kembar dua"],correct:0},
+            {q:"Quintuplets",options:["Kembar tiga","Kembar lima","Anak tunggal","Sepupu"],correct:1},
+            {q:"Related",options:["Berjauhan","Berhubungan erat","Bermusuhan","Tidak kenal"],correct:1},
+            {q:"Relations",options:["Persaingan","Relasi/hubungan","Pekerjaan","Perjalanan"],correct:1},
+            {q:"Relative",options:["Sanak kerabat","Orang asing","Tetangga","Musuh"],correct:0},
+            {q:"Second cousin",options:["Saudara kandung","Sepupu kedua","Anak tiri","Mertua"],correct:1},
+            {q:"Senior",options:["Anak muda","Junior","Senior","Balita"],correct:2},
+            {q:"Separation",options:["Pernikahan","Pertemuan","Perceraian/perpisahan","Persahabatan"],correct:2},
+            {q:"Sibling",options:["Saudara kandung","Keponakan","Cucu","Kakek"],correct:0},
+            {q:"Single",options:["Menikah","Lajang/jomblo","Tunangan","Berkeluarga"],correct:1},
+            {q:"Sisterhood",options:["Persaudaraan","Permusuhan","Perserikatan","Persatuan"],correct:0},
+            {q:"Sisterly",options:["Seperti ayah","Bersifat persaudaraan","Seperti musuh","Sangat galak"],correct:1},
+            {q:"Spouse",options:["Pacar","Pasangan (suami/istri)","Mantan","Tunangan"],correct:1},
+            {q:"Stepbrother",options:["Adik kandung","Saudara tiri laki-laki","Kakak ipar","Sepupu"],correct:1},
+            {q:"Stepdad",options:["Ayah kandung","Paman","Ayah tiri","Kakek"],correct:2},
+            {q:"Stepdaughter",options:["Anak tiri perempuan","Anak kandung","Keponakan","Cucu"],correct:0},
+            {q:"Stepfather",options:["Mertua","Ayah tiri","Ayah angkat","Paman"],correct:1},
+            {q:"Stepmom",options:["Ibu kandung","Ibu tiri","Bibi","Nenek"],correct:1},
+            {q:"Stepmother",options:["Ibu mertua","Ibu tiri","Kakak perempuan","Pengasuh"],correct:1},
+            {q:"Stepsister",options:["Kakak kandung","Saudara tiri perempuan","Adik ipar","Teman perempuan"],correct:1},
+            {q:"Stepson",options:["Anak kandung laki-laki","Anak tiri laki-laki","Keponakan","Cucu"],correct:1},
+            {q:"Surrogate mother",options:["Ibu kandung","Wali perempuan","Ibu mertua","Ibu angkat"],correct:3},
+            {q:"Tribe",options:["Bangsa","Suku","Negara","Desa"],correct:1},
+            {q:"Triplets",options:["Kembar dua","Kembar tiga","Kembar empat","Kembar lima"],correct:1},
+            {q:"Trust",options:["Kebohongan","Kepercayaan","Keraguan","Ketakutan"],correct:1},
+            {q:"Trustworthy",options:["Dapat dipercaya","Suka menipu","Berbahaya","Tidak jujur"],correct:0},
+            {q:"Twin brother",options:["Kakak laki-laki","Saudara kembar laki-laki","Adik laki-laki","Saudara ipar"],correct:1},
+            {q:"Twin sister",options:["Saudara kembar perempuan","Kakak perempuan","Adik tiri","Bibi"],correct:0},
+            {q:"Twins",options:["Saudara jauh","Saudara kembar","Teman akrab","Anak-anak"],correct:1},
+            {q:"Wedding",options:["Ulang tahun","Pernikahan","Kelahiran","Kematian"],correct:1},
+            {q:"Wedlock",options:["Janji setia","Ikatan pernikahan","Masa pertunangan","Masa lajang"],correct:1},
+            {q:"Wife",options:["Suami","Istri","Ibu","Nona"],correct:1},
+            {q:"Youth",options:["Orang tua","Kaum muda","Bayi","Anak-anak"],correct:1},
+            {q:"Ambitious",options:["Malas","Ambisius","Jujur","Ramah"],correct:1},
+            {q:"Persistent",options:["Mudah menyerah","Gigih, tidak mudah menyerah","Konyol","Pemarah"],correct:1},
+            {q:"Generous",options:["Murah hati, dermawan","Pelit","Sombong","Kasar"],correct:0},
+            {q:"Helpful",options:["Suka mengganggu","Suka menolong/membantu","Tidak peduli","Egois"],correct:1},
+            {q:"Kind",options:["Jahat","Baik","Pintar","Berani"],correct:1},
+            {q:"Unselfish",options:["Egois","Tidak mementingkan diri sendiri","Rakus","Kikir"],correct:1},
+            {q:"Honest",options:["Pembohong","Jujur","Penakut","Sombong"],correct:1},
+            {q:"Sincere",options:["Palsu","Tulus","Kasar","Malas"],correct:1},
+            {q:"Straight-forward",options:["Berbelit-belit","Terus terang","Pendiam","Pemalu"],correct:1},
+            {q:"Funny",options:["Serius","Lucu","Galak","Angkuh"],correct:1},
+            {q:"Silly",options:["Bijaksana","Konyol","Dewasa","Hebat"],correct:1},
+            {q:"Indolent",options:["Rajin","Lamban, malas","Cepat","Tangkas"],correct:1},
+            {q:"Lazy",options:["Giat","Malas","Tekun","Semangat"],correct:1},
+            {q:"Angry",options:["Senang","Marah","Sedih","Takut"],correct:1},
+            {q:"Emotional",options:["Tenang","Emosional","Dingin","Cuek"],correct:1},
+            {q:"Moody",options:["Suka berubah-ubah perasaan","Selalu bahagia","Pendirian tetap","Sangat sabar"],correct:0},
+            {q:"Fashionable",options:["Ketinggalan zaman","Modis, mengikuti mode","Sederhana","Berantakan"],correct:1},
+            {q:"Up-to-date",options:["Kuno","Aktual, mutakhir, terbaru","Bersejarah","Lama"],correct:1},
+            {q:"Diligent",options:["Malas","Rajin","Santai","Lambat"],correct:1},
+            {q:"Hard-working",options:["Pengangguran","Bekerja keras","Manja","Lemah"],correct:1},
+            {q:"Affable",options:["Kasar","Ramah, sopan","Menakutkan","Pendiam"],correct:1},
+            {q:"Friendly",options:["Musuh","Ramah","Jahat","Egois"],correct:1},
+            {q:"Polite",options:["Kurang ajar","Sopan","Berisik","Nakal"],correct:1},
+            {q:"The United States",options:["Amerika Serikat","Inggris","Afrika Selatan","Kanada"],correct:0},
+            {q:"South Africa",options:["Amerika Serikat","Afrika Selatan","Australia","Belanda"],correct:1},
+            {q:"Netherlands",options:["Belgia","Finlandia","Belanda","Jerman"],correct:2},
+            {q:"Belgium",options:["Belgia","Belanda","Perancis","Swedia"],correct:0},
+            {q:"Finland",options:["Irlandia","Islandia","Finlandia","Norwegia"],correct:2},
+            {q:"England",options:["Inggris","Amerika","Selandia Baru","Singapura"],correct:0},
+            {q:"Ireland",options:["Islandia","Finlandia","Thailand","Irlandia"],correct:3},
+            {q:"Iceland",options:["Irlandia","Islandia","Swedia","Swiss"],correct:1},
+            {q:"Italy",options:["India","Inggris","Italia","Maroko"],correct:2},
+            {q:"Japan",options:["Jerman","Jepang","Tiongkok","Korea Selatan"],correct:1},
+            {q:"Germany",options:["Jerman","Jepang","Belgia","Belanda"],correct:0},
+            {q:"Canada",options:["Kanada","Korea Selatan","Kamerun","Kolombia"],correct:0},
+            {q:"South Korea",options:["Korea Utara","Korea Selatan","Jepang","Tiongkok"],correct:1},
+            {q:"Morocco",options:["Mesir","Maroko","Rusia","Turki"],correct:1},
+            {q:"Egypt",options:["Turki","India","Mesir","Perancis"],correct:2},
+            {q:"Norway",options:["Norwegia","Swedia","Selandia Baru","Finlandia"],correct:0},
+            {q:"France",options:["Jerman","Italia","Perancis","Belgia"],correct:2},
+            {q:"Russia",options:["Rusia","Rumania","Tiongkok","Maroko"],correct:0},
+            {q:"New Zealand",options:["Belanda","Selandia Baru","Australia","Inggris"],correct:1},
+            {q:"Singapore",options:["Malaysia","Singapura","Thailand","Filipina"],correct:1},
+            {q:"Sweden",options:["Swedia","Swiss","Norwegia","Finlandia"],correct:0},
+            {q:"Switzerland",options:["Swedia","Swiss","Belanda","Islandia"],correct:1},
+            {q:"Republic of China (Tiongkok)",options:["Korea","Jepang","Tiongkok","Singapura"],correct:2},
+            {q:"Turkey",options:["Mesir","Turki","Maroko","Rusia"],correct:1},
+            {q:"Tall",options:["Pendek","Tinggi","Kurus","Langsing"],correct:1},
+            {q:"Short",options:["Tinggi","Gemuk","Pendek","Kecil"],correct:2},
+            {q:"Medium height",options:["Sangat tinggi","Tinggi sedang","Cukup pendek","Berat ideal"],correct:1},
+            {q:"Skinny/Thin",options:["Kurus","Berotot","Lebar","Kuat"],correct:0},
+            {q:"Underweight",options:["Kelebihan berat badan","Berat badan ideal","Kurang berat badan","Berat badan normal"],correct:2},
+            {q:"Slim/Slender",options:["Pendek","Langsing","Gemuk","Kurus"],correct:1},
+            {q:"Fat",options:["Kurus","Gendut","Tinggi","Berotot"],correct:1},
+            {q:"Overweight",options:["Kurus","Kelebihan berat badan","Ideal","Sehat"],correct:1},
+            {q:"Plump/Stocky",options:["Kurus","Gemuk","Langsing","Pendek"],correct:1},
+            {q:"Bonny",options:["Kurus","Berisi","Lemah","Kecil"],correct:1},
+            {q:"Roof",options:["Lantai","Atap","Dinding","Pintu"],correct:1},
+            {q:"Floor",options:["Atap","Lantai","Jendela","Langit-langit"],correct:1},
+            {q:"Window",options:["Pintu","Jendela","Atap","Tangga"],correct:1},
+            {q:"Door",options:["Jendela","Pintu","Lantai","Dinding"],correct:1},
+            {q:"Balcony",options:["Teras","Balkon","Garasi","Atap"],correct:1}
+        ];
+
+        // ==================== STATE MANAGEMENT ====================
+        let currentQ = 0, score = 0, correct = 0, wrong = 0, timer = 30, timerInt, selected = null;
+        let history = JSON.parse(localStorage.getItem('quizHistory')) || [];
+        let sessionId = null;
+
+        // Update total soal
+        document.getElementById('totalSoal').textContent = quizData.length;
+        document.getElementById('totalNum').textContent = quizData.length;
+
+        // ==================== QUIZ FUNCTIONS ====================
+        function startQuiz() {
+            currentQ = 0; score = 0; correct = 0; wrong = 0;
+            sessionId = Date.now().toString();
+            document.getElementById('landing').classList.add('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            loadQ();
+            startTimer();
+        }
+
+        function loadQ() {
+            const q = quizData[currentQ];
+            document.getElementById('currentNum').textContent = currentQ + 1;
+            document.getElementById('question').textContent = q.q;
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('progress').style.width = ((currentQ + 1) / quizData.length * 100) + '%';
+            
+            const opts = document.getElementById('options');
+            opts.innerHTML = '';
+            const labels = ['A','B','C','D'];
+            
+            q.options.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.innerHTML = `
+                    <span class="option-label">${labels[i]}</span>
+                    <span class="font-medium text-lg">${opt}</span>
+                `;
+                div.onclick = () => selectOption(i, div);
+                opts.appendChild(div);
+            });
+            
+            selected = null;
+            resetTimer();
+        }
+
+        function selectOption(idx, el) {
+            if (selected !== null) return;
+            selected = idx;
+            
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                if (i === idx) opt.classList.add('selected');
+                else opt.style.opacity = '0.5';
+            });
+            
+            // CEPAT - langsung check tanpa delay
+            checkAnswer(idx, el);
+        }
+
+        function checkAnswer(idx, el) {
+            const q = quizData[currentQ];
+            const isCorrect = idx === q.correct;
+            
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                opt.classList.remove('selected');
+                opt.style.opacity = '1';
+                if (i === q.correct) opt.classList.add('correct');
+                else if (i === idx && !isCorrect) opt.classList.add('wrong');
+            });
+            
+            if (isCorrect) {
+                correct++;
+                score += 5; // SCORE 5 PER JAWABAN BENAR
+                document.getElementById('correct').textContent = correct;
+                playSound('correct');
+            } else {
+                wrong++;
+                playSound('wrong');
+            }
+            
+            document.getElementById('score').textContent = score;
+            
+            // CEPAT - 500ms langsung pindah soal
+            setTimeout(() => {
+                currentQ++;
+                if (currentQ < quizData.length) loadQ();
+                else finish();
+            }, 500);
+        }
+
+        function startTimer() {
+            clearInterval(timerInt);
+            timer = 30;
+            updateTimer();
+            timerInt = setInterval(() => {
+                timer--;
+                updateTimer();
+                if (timer <= 0) {
+                    clearInterval(timerInt);
+                    wrong++;
+                    playSound('wrong');
+                    currentQ++;
+                    if (currentQ < quizData.length) loadQ();
+                    else finish();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInt);
+            timer = 30;
+            updateTimer();
+            startTimer();
+        }
+
+        function updateTimer() {
+            document.getElementById('timerDisplay').textContent = timer;
+            const circle = document.getElementById('timerProgress');
+            const offset = 226 - (timer / 30 * 226);
+            circle.style.strokeDashoffset = offset;
+            circle.style.stroke = timer <= 10 ? '#ef4444' : '#6366f1';
+        }
+
+        function pauseQuiz() {
+            clearInterval(timerInt);
+            document.getElementById('pauseModal').classList.add('active');
+        }
+
+        function resumeQuiz() {
+            document.getElementById('pauseModal').classList.remove('active');
+            startTimer();
+        }
+
+        function saveExit() {
+            const data = {
+                id: sessionId,
+                date: new Date().toLocaleDateString('id-ID'),
+                time: new Date().toLocaleTimeString('id-ID'),
+                question: currentQ,
+                score, correct, wrong,
+                completed: false
+            };
+            history = history.filter(h => h.id !== sessionId);
+            history.unshift(data);
+            if (history.length > 10) history = history.slice(0, 10);
+            localStorage.setItem('quizHistory', JSON.stringify(history));
+            location.reload();
+        }
+
+        function finish() {
+            clearInterval(timerInt);
+            
+            const acc = (correct / quizData.length * 100).toFixed(1);
+            let grade = 'E', color = 'text-red-400';
+            if (acc >= 90) { grade = 'A'; color = 'text-green-400'; }
+            else if (acc >= 80) { grade = 'B'; color = 'text-indigo-400'; }
+            else if (acc >= 70) { grade = 'C'; color = 'text-yellow-400'; }
+            else if (acc >= 60) { grade = 'D'; color = 'text-orange-400'; }
+            
+            const result = {
+                id: sessionId || Date.now().toString(),
+                date: new Date().toLocaleDateString('id-ID'),
+                time: new Date().toLocaleTimeString('id-ID'),
+                score, correct, wrong,
+                accuracy: acc,
+                grade,
+                completed: true,
+                total: quizData.length
+            };
+            
+            history = history.filter(h => h.id !== result.id);
+            history.unshift(result);
+            if (history.length > 10) history = history.slice(0, 10);
+            localStorage.setItem('quizHistory', JSON.stringify(history));
+            
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            
+            document.getElementById('finalCorrect').textContent = correct;
+            document.getElementById('finalWrong').textContent = wrong;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalAccuracy').textContent = acc + '%';
+            
+            const gEl = document.getElementById('finalGrade');
+            gEl.textContent = grade;
+            gEl.className = `text-3xl font-bold ${color}`;
+            
+            document.getElementById('certScore').textContent = grade;
+            document.getElementById('certPercent').textContent = `(${Math.round(acc)}%)`;
+            document.getElementById('certDate').textContent = new Date().toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            
+            // Auto-fill name
+            const savedName = localStorage.getItem('lastCertName') || '';
+            if (savedName) {
+                document.getElementById('nameInput').value = savedName;
+                updateName(savedName);
+            }
+            
+            // Confetti
+            createConfetti();
+        }
+
+        function createConfetti() {
+            const colors = ['#6366f1', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    c.style.animation = `confetti-fall ${3 + Math.random() * 2}s linear forwards`;
+                    document.body.appendChild(c);
+                    setTimeout(() => c.remove(), 5000);
+                }, i * 20);
+            }
+        }
+
+        // ==================== HISTORY FUNCTIONS ====================
+        function toggleHistory() {
+            const sec = document.getElementById('historySection');
+            const list = document.getElementById('historyList');
+            
+            if (sec.classList.contains('hidden')) {
+                sec.classList.remove('hidden');
+                renderHistory();
+            } else {
+                sec.classList.add('hidden');
+            }
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            
+            if (history.length === 0) {
+                list.innerHTML = '<p class="text-center py-4 text-gray-500">Belum ada riwayat</p>';
+                return;
+            }
+            
+            history.forEach((h, i) => {
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-xl border cursor-pointer transition hover:translate-x-2 ${
+                    h.completed ? 'bg-green-500/10 border-green-500/30' : 'bg-amber-500/10 border-amber-500/30'
+                }`;
+                
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-sm ${h.completed ? 'text-green-400' : 'text-amber-400'}">
+                                ${h.completed ? 'Selesai' : 'Dijeda'}
+                            </p>
+                            <p class="text-xs text-gray-400">${h.date} • ${h.time}</p>
+                            ${h.completed 
+                                ? `<p class="text-xs text-gray-400">${h.correct}/${h.total} benar • Grade ${h.grade}</p>`
+                                : `<p class="text-xs text-amber-400">Soal ${h.question + 1}</p>`
+                            }
+                        </div>
+                        <div class="text-right">
+                            ${h.completed 
+                                ? `<p class="text-xl font-bold text-indigo-400">${h.score}</p>`
+                                : '<button class="px-3 py-1 bg-amber-500 text-white rounded text-xs">Lanjut</button>'
+                            }
+                        </div>
+                    </div>
+                `;
+                
+                if (!h.completed) {
+                    div.onclick = () => resumeHistory(i);
+                }
+                list.appendChild(div);
+            });
+        }
+
+        function resumeHistory(i) {
+            const h = history[i];
+            if (!h || h.completed) return;
+            if (!confirm(`Lanjutkan dari soal ${h.question + 1}?`)) return;
+            
+            sessionId = h.id;
+            currentQ = h.question;
+            score = h.score || 0;
+            correct = h.correct || 0;
+            wrong = h.wrong || 0;
+            
+            document.getElementById('landing').classList.add('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            loadQ();
+            startTimer();
+        }
+
+        function clearHistory() {
+            if (confirm('Hapus semua riwayat?')) {
+                history = [];
+                localStorage.removeItem('quizHistory');
+                renderHistory();
+            }
+        }
+
+        // ==================== CERTIFICATE FUNCTIONS ====================
+        function scrollToCert() {
+            document.getElementById('certSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateName(val) {
+            const name = val.trim() || '[Nama Peserta]';
+            document.getElementById('certName').textContent = name;
+            localStorage.setItem('lastCertName', val.trim());
+        }
+
+        function printCert() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (!name) return alert('Isi nama dulu!');
+            
+            const certContainer = document.getElementById('certContainer').cloneNode(true);
+            const printWindow = window.open('', '_blank');
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Sertifikat - ${name}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { 
+                            background: #0a0a0f; 
+                            display: flex; 
+                            justify-content: center; 
+                            align-items: center; 
+                            min-height: 100vh; 
+                            padding: 40px;
+                            font-family: 'Inter', sans-serif;
+                        }
+                        .cert-container {
+                            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #1e1b4b 100%);
+                            padding: 40px;
+                            border-radius: 20px;
+                            width: 100%;
+                            max-width: 900px;
+                        }
+                        .cert-paper {
+                            background: linear-gradient(135deg, #fefce8 0%, #fffbeb 50%, #fef3c7 100%);
+                            padding: 60px;
+                            border-radius: 8px;
+                            position: relative;
+                            border: 3px double #fbbf24;
+                        }
+                        .cert-border-inner {
+                            position: absolute;
+                            top: 20px;
+                            left: 20px;
+                            right: 20px;
+                            bottom: 20px;
+                            border: 2px solid rgba(251, 191, 36, 0.4);
+                            border-radius: 4px;
+                        }
+                        .cert-header { text-align: center; margin-bottom: 40px; }
+                        .cert-logo {
+                            width: 100px;
+                            height: 100px;
+                            background: linear-gradient(135deg, #1e3a8a, #3730a3);
+                            border-radius: 50%;
+                            margin: 0 auto 20px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-size: 2.5rem;
+                            border: 4px solid #fbbf24;
+                        }
+                        .cert-title {
+                            font-family: 'Cinzel', serif;
+                            font-size: 2.8rem;
+                            color: #1e3a8a;
+                            letter-spacing: 4px;
+                            text-transform: uppercase;
+                            font-weight: 700;
+                        }
+                        .cert-subtitle {
+                            font-family: 'Playfair Display', serif;
+                            font-size: 1.3rem;
+                            color: #b45309;
+                            margin-top: 10px;
+                            font-style: italic;
+                        }
+                        .cert-body { text-align: center; margin: 40px 0; }
+                        .cert-presented {
+                            font-family: 'Playfair Display', serif;
+                            font-size: 1.1rem;
+                            color: #92400e;
+                            text-transform: uppercase;
+                            letter-spacing: 3px;
+                            margin-bottom: 20px;
+                        }
+                        .cert-recipient {
+                            font-family: 'Great Vibes', cursive;
+                            font-size: 3.5rem;
+                            color: #1e3a8a;
+                            margin: 20px 0;
+                            padding: 10px 40px;
+                            border-bottom: 3px solid #fbbf24;
+                            display: inline-block;
+                        }
+                        .cert-description {
+                            font-family: 'Playfair Display', serif;
+                            font-size: 1.1rem;
+                            color: #78350f;
+                            line-height: 1.8;
+                        }
+                        .cert-achievement {
+                            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(251, 191, 36, 0.05));
+                            border: 2px solid #fbbf24;
+                            border-radius: 12px;
+                            padding: 20px 40px;
+                            display: inline-block;
+                            margin: 30px 0;
+                        }
+                        .cert-grade {
+                            font-family: 'Cinzel', serif;
+                            font-size: 4rem;
+                            color: #1e3a8a;
+                            font-weight: 700;
+                        }
+                        .cert-score { font-size: 1.2rem; color: #92400e; margin-top: 5px; }
+                        .cert-footer {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-end;
+                            margin-top: 50px;
+                            padding: 0 40px;
+                        }
+                        .cert-signature, .cert-date { text-align: center; }
+                        .cert-line {
+                            width: 200px;
+                            height: 2px;
+                            background: #1e3a8a;
+                            margin-bottom: 10px;
+                        }
+                        .cert-label {
+                            font-family: 'Playfair Display', serif;
+                            font-size: 0.9rem;
+                            color: #78350f;
+                            text-transform: uppercase;
+                            letter-spacing: 2px;
+                        }
+                        .cert-seal {
+                            width: 120px;
+                            height: 120px;
+                            background: radial-gradient(circle at 30% 30%, #dc2626, #991b1b);
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-size: 3rem;
+                            border: 4px solid rgba(220, 38, 38, 0.3);
+                        }
+                        @media print {
+                            body { background: white; padding: 0; }
+                            .cert-container { box-shadow: none; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${certContainer.outerHTML}
+                    <div class="no-print" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);">
+                        <button onclick="window.print()" style="padding: 12px 24px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            Print Sertifikat
+                        </button>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // ==================== SOUND FUNCTIONS ====================
+        function playSound(type) {
+            if (!soundEnabled) return;
+            
+            // Different sounds based on selection
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            if (type === 'correct') {
+                if (currentSound === 'default') {
+                    osc.frequency.value = 800;
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.1);
+                } else if (currentSound === 'pop') {
+                    osc.frequency.value = 1200;
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.15);
+                } else if (currentSound === 'arcade') {
+                    osc.frequency.value = 600;
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.2);
+                }
+            } else {
+                // Wrong sound
+                osc.frequency.value = 200;
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
+            }
+        }
+
+        // ==================== KEYBOARD SUPPORT ====================
+        document.addEventListener('keydown', e => {
+            if (document.getElementById('quiz').classList.contains('hidden')) return;
+            if (e.key >= '1' && e.key <= '4') {
+                const btns = document.querySelectorAll('.option');
+                if (btns[e.key - 1] && selected === null) btns[e.key - 1].click();
+            }
+            if (e.key === 'Escape') pauseQuiz();
+        });
+
+        // ==================== MODAL CLOSE ON OUTSIDE CLICK ====================
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
+        
